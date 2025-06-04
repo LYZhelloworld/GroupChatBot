@@ -2,7 +2,7 @@ import json
 import re
 
 from langchain_core.language_models import LanguageModelInput
-from langchain_core.messages import BaseMessage, AIMessage, ToolMessage
+from langchain_core.messages import BaseMessage, AIMessage, ToolMessage, trim_messages
 from langchain_core.runnables.base import Runnable
 from tools.tools import tools
 
@@ -47,3 +47,15 @@ def handle_tool_calls(llm: Runnable[LanguageModelInput, BaseMessage], history: l
         response = llm.invoke(tmp_history)
 
     return response
+
+
+def trim_latest_messsages(messages: list[BaseMessage], n: int):
+    return trim_messages(
+        messages,
+        strategy='last',
+        token_counter=len,
+        max_tokens=n,
+        start_on='human',
+        end_on=('human', 'tool'),
+        include_system=True,
+        allow_partial=False)

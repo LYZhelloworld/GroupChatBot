@@ -7,7 +7,7 @@ from agent.agent import Agent
 from agent.history import AgentHistory
 from orchestrator.prompts import system_prompt
 from tools.tools import get_user_list
-from utils.utils import handle_tool_calls, remove_think_tags
+from utils.utils import handle_tool_calls, remove_think_tags, trim_latest_messsages
 
 
 USER_AGENT_NAME = "user"
@@ -46,15 +46,7 @@ class Orchestrator:
             return USER_AGENT_NAME
 
         messages = self.__system_prompt + self.__generate_message_history()
-        messages = trim_messages(
-            messages,
-            strategy='last',
-            token_counter=len,
-            max_tokens=20,
-            start_on='human',
-            end_on=('human', 'tool'),
-            include_system=True,
-            allow_partial=False)
+        messages = trim_latest_messsages(messages, 20)
 
         response = handle_tool_calls(self.__llm, messages, self.__llm.invoke(messages))
         response_text = remove_think_tags(response.text())

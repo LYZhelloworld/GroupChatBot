@@ -3,7 +3,7 @@ from langchain_ollama import ChatOllama
 from agent.history import AgentHistory
 from tools.tools import user_dict, UserData, tools
 from agent.prompts import system_prompt
-from utils.utils import handle_tool_calls, remove_think_tags
+from utils.utils import handle_tool_calls, remove_think_tags, trim_latest_messsages
 
 
 class Agent:
@@ -23,6 +23,7 @@ class Agent:
 
     def receive_message(self):
         history = self.__system_prompt + self.__history.get_llm_messages_based_on(self.__name)
+        history = trim_latest_messsages(history, 20)
         response = handle_tool_calls(self.__llm, history, self.__llm.invoke(history))
 
         response_text = remove_think_tags(response.text())

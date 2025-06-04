@@ -1,0 +1,7 @@
+[project]
+name = "group_chat_bot"
+version = "1.0.0"
+description = "GroupChatBot is an interactive chatting tool with multiple agents, powered by local deployed LLM."
+readme = "README.md"
+requires-python = ">=3.13"
+dependencies = []

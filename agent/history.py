@@ -13,7 +13,7 @@ class AgentHistory:
     def __init__(self, file_path: str):
         self.__file_path = file_path
         self.__history: list[AgentHistoryItem] = []
-        self.load_json()
+        # self.load_json()
 
     @property
     def history(self):

@@ -13,5 +13,6 @@
   },
   "autopep8.args": [
     "--max-line-length=150"
-  ]
+  ],
+  "python.analysis.typeCheckingMode": "standard"
 }

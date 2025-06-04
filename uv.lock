@@ -223,7 +223,7 @@ wheels = [
 ]
 
 [[package]]
-name = "group-chat-bot"
+name = "group-chatbot"
 version = "1.0.0"
 source = { virtual = "." }
 dependencies = [
@@ -231,6 +231,7 @@ dependencies = [
     { name = "langchain-community" },
     { name = "langchain-ollama" },
     { name = "ollama" },
+    { name = "pydantic" },
 ]
 
 [package.metadata]
@@ -239,6 +240,7 @@ requires-dist = [
     { name = "langchain-community", specifier = ">=0.3.24" },
     { name = "langchain-ollama", specifier = ">=0.3.3" },
     { name = "ollama", specifier = ">=0.5.1" },
+    { name = "pydantic", specifier = ">=2.11.5" },
 ]
 
 [[package]]

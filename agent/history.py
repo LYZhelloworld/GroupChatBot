@@ -1,5 +1,5 @@
 import json
-from typing import Callable
+import os
 from langchain_core.messages import BaseMessage, HumanMessage, AIMessage
 from pydantic import BaseModel
 
@@ -13,6 +13,7 @@ class AgentHistory:
     def __init__(self, file_path: str):
         self.__file_path = file_path
         self.__history: list[AgentHistoryItem] = []
+        self.load_json()
 
     @property
     def history(self):
@@ -20,6 +21,7 @@ class AgentHistory:
 
     def add(self, name: str, message: str):
         self.__history.append(AgentHistoryItem(name=name, message=message))
+        self.dump_json()
 
     def get_llm_messages_based_on(self, name: str) -> list[BaseMessage]:
         messages: list[BaseMessage] = []
@@ -40,5 +42,10 @@ class AgentHistory:
             json.dump([i.model_dump() for i in self.__history], fp=fp, ensure_ascii=False, indent=2)
 
     def load_json(self):
+        if not os.path.exists(self.__file_path):
+            self.__history = []
+            self.dump_json()
+            return
+
         with open(self.__file_path, 'r', encoding='utf-8') as fp:
             self.__history = [AgentHistoryItem(**i) for i in json.load(fp)]

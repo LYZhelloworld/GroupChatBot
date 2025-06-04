@@ -23,7 +23,6 @@ class AgentOrchestrator:
 
     def chat(self, message: str):
         self.__history.add(USER_AGENT_NAME, message)
-        self.__chat_message_hook(USER_AGENT_NAME, message)
 
         while True:
             history_length = len(self.__history.history)

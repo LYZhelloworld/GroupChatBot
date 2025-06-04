@@ -14,7 +14,7 @@ class Agent:
 
         user_dict[name] = UserData(instructions=instructions)
 
-        llm = ChatOllama(model="qwen3:8b", base_url='http://ollama:11434')
+        llm = ChatOllama(model="qwen3:8b", base_url='http://localhost:11434')
         self.__llm = llm.bind_tools(tools)
 
     def receive_message(self):
@@ -30,7 +30,7 @@ class Agent:
     def __handle_tool_calls(self, history: list[BaseMessage], response: BaseMessage) -> BaseMessage:
         tmp_history = history.copy()
 
-        while isinstance(response, AIMessage) and response.tool_calls:
+        while isinstance(response, AIMessage) and len(response.tool_calls) > 0:
             tmp_history.append(response)
             # Handle tool calls
             for tool in response.tool_calls:
@@ -39,7 +39,7 @@ class Agent:
                 tool_args = tool['args']
                 for t in tools:
                     if t.name == tool_name:
-                        tool_response = t.run(**tool_args)
+                        tool_response = t.invoke(tool_args)
                         tmp_history.append(ToolMessage(content=tool_response, tool_call_id=tool_id))
 
             response = self.__llm.invoke(history + tmp_history)

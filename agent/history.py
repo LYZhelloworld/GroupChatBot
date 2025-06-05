@@ -1,7 +1,9 @@
 import json
 import os
+
 from langchain_core.messages import BaseMessage, HumanMessage, AIMessage
 from pydantic import BaseModel
+from utils.constants import *
 
 
 class AgentHistoryItem(BaseModel):
@@ -13,7 +15,7 @@ class AgentHistory:
     def __init__(self, file_path: str):
         self.__file_path = file_path
         self.__history: list[AgentHistoryItem] = []
-        # self.load_json()
+        self.load_json()
 
     @property
     def history(self):
@@ -21,6 +23,8 @@ class AgentHistory:
 
     def add(self, name: str, message: str):
         self.__history.append(AgentHistoryItem(name=name, message=message))
+        if name != USER_AGENT_NAME:
+            print(f'[{name}] {message}')
         self.dump_json()
 
     def get_llm_messages_based_on(self, name: str) -> list[BaseMessage]:
@@ -49,3 +53,10 @@ class AgentHistory:
 
         with open(self.__file_path, 'r', encoding='utf-8') as fp:
             self.__history = [AgentHistoryItem(**i) for i in json.load(fp)]
+
+    def print_all_history(self):
+        for item in self.__history:
+            if item.name == USER_AGENT_NAME:
+                print(f'>>> {item.message}')
+            else:
+                print(f'[{item.name}] {item.message}')

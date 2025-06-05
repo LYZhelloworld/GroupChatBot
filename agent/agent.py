@@ -4,6 +4,7 @@ from agent.history import AgentHistory
 from tools.tools import user_dict, UserData, tools
 from agent.prompts import system_prompt
 from utils.utils import handle_tool_calls, remove_think_tags, trim_latest_messsages
+from utils.constants import *
 
 
 class Agent:
@@ -15,7 +16,7 @@ class Agent:
 
         user_dict[name] = UserData(instructions=instructions)
 
-        self.__llm = ChatOllama(model="qwen3:8b").bind_tools(tools)
+        self.__llm = ChatOllama(base_url=OLLAMA_URL, model=OLLAMA_MODEL).bind_tools(tools)
 
     @property
     def name(self) -> str:

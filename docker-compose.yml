@@ -1,0 +1,41 @@
+networks:
+  group-chatbot-net:
+    driver: bridge
+
+services:
+  ollama:
+    image: ollama/ollama:latest
+    container_name: ollama
+    ports:
+      - "11434:11434"
+    networks:
+      - group-chatbot-net
+    volumes:
+      - ~/.ollama:/root/.ollama
+    restart: unless-stopped
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: -1
+              capabilities: ["gpu"]
+
+  group-chatbot:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: chatbot
+    stdin_open: true
+    tty: true
+    
+    networks:
+      - group-chatbot-net
+    volumes:
+      - ./agent_history.json:/app/agent_history.json
+    depends_on:
+      - ollama
+    restart: unless-stopped
+    environment:
+      - OLLAMA_URL=http://ollama:11434
+      - OLLAMA_MODEL=qwen3:8b

@@ -1,4 +1,4 @@
-from typing import Callable, Iterable
+from typing import Iterable
 
 from langchain_core.messages import BaseMessage, HumanMessage, AIMessage, trim_messages
 from langchain_core.prompts import ChatPromptTemplate
@@ -7,10 +7,8 @@ from agent.agent import Agent
 from agent.history import AgentHistory
 from orchestrator.prompts import system_prompt
 from tools.tools import get_user_list
+from utils.constants import *
 from utils.utils import handle_tool_calls, remove_think_tags, trim_latest_messsages
-
-
-USER_AGENT_NAME = "user"
 
 
 class Orchestrator:
@@ -21,7 +19,7 @@ class Orchestrator:
 
         self.__system_prompt = ChatPromptTemplate([('system', system_prompt)]).format_messages(
             user_list='\n'.join(self.__agent_names))
-        self.__llm = ChatOllama(model="qwen3:8b").bind_tools([get_user_list])
+        self.__llm = ChatOllama(base_url=OLLAMA_URL, model=OLLAMA_MODEL).bind_tools([get_user_list])
 
     def chat(self, message: str):
         self.__history.add(USER_AGENT_NAME, message)
@@ -32,7 +30,6 @@ class Orchestrator:
                 break
             agent = self.__agents[self.__agent_names.index(next_agent)]
             agent.receive_message()
-            print(f'[{self.__history.history[-1].name}] {self.__history.history[-1].message}')
 
     def __generate_message_history(self):
         messages: list[BaseMessage] = []

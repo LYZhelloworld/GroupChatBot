@@ -1,10 +1,9 @@
-import readline
-
+from ollama import Client
+from prompt_toolkit import prompt
 from agent.agent import Agent
 from agent.history import AgentHistory
 from orchestrator.orchestrator import Orchestrator
 from utils.constants import *
-from ollama import Client
 
 
 def prepare_model():
@@ -35,7 +34,7 @@ def main():
     agent_history.print_all_history()
 
     while True:
-        user_input = input(">>> ")
+        user_input = prompt(">>> ")
         if user_input == "/exit":
             break
 

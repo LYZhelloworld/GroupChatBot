@@ -9,5 +9,6 @@ dependencies = [
     "langchain-community>=0.3.24",
     "langchain-ollama>=0.3.3",
     "ollama>=0.5.1",
+    "prompt-toolkit>=3.0.51",
     "pydantic>=2.11.5",
 ]

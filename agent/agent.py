@@ -3,10 +3,10 @@ import logging
 from typing import TypedDict
 from langchain_core.prompts import ChatPromptTemplate
 from langchain_ollama import ChatOllama
-from langgraph.graph import StateGraph, START
+from langgraph.graph import StateGraph, START, END
 from agent.history import AgentHistory
 from tools.tools import user_dict, UserData, tools
-from agent.prompts import system_prompt, system_prompt_decide_reply
+from agent.prompts import system_prompt, system_prompt_decide_reply, json_output_example
 from utils.utils import handle_tool_calls, remove_think_tags, trim_latest_messsages
 from utils.constants import *
 
@@ -36,7 +36,7 @@ class Agent:
 
         self.__system_prompt = ChatPromptTemplate([('system', system_prompt)]).format_messages(name=name, instructions=instructions)
         self.__system_prompt_decide_reply = ChatPromptTemplate(
-            [('system', system_prompt_decide_reply)]).format_messages(name=name, instructions=instructions)
+            [('system', system_prompt_decide_reply)]).format_messages(name=name, instructions=instructions, json_output_example=json_output_example)
 
         user_dict[name] = UserData(instructions=instructions)
 
@@ -46,7 +46,7 @@ class Agent:
         graph_builder.add_node(STATE_DECIDE_REPLY, self.__decide_reply)
         graph_builder.add_node(STATE_GENERATE_RESPONSE, self.__generate_response)  # TODO
         graph_builder.add_edge(START, STATE_DECIDE_REPLY)
-        graph_builder.add_edge(STATE_DECIDE_REPLY, STATE_GENERATE_RESPONSE)
+        graph_builder.add_conditional_edges(STATE_DECIDE_REPLY, lambda state: STATE_GENERATE_RESPONSE if state['should_reply'] else END)
         self.__workflow = graph_builder.compile()
 
         self.__logger = logging.getLogger(__name__)
@@ -62,12 +62,13 @@ class Agent:
         history = self.__system_prompt_decide_reply + state['history'].get_llm_messages_based_on(self.__name)
         history = trim_latest_messsages(history, 20)
         response = handle_tool_calls(self.__llm, history, self.__llm.invoke(history))
+        response_text = remove_think_tags(response.text())
 
         try:
-            response_json = json.loads(response.text())
+            response_json = json.loads(response_text)
         except json.JSONDecodeError:
-            response_json = {'should_reply': False, 'reason': f'Error: invalid JSON\n{response.text()}'}
-            self.__logger.warning(f'Agent "{self.__name}" decides not to reply due to invalid JSON: {response.text()}')
+            response_json = {'should_reply': False, 'reason': f'Error: invalid JSON\n{response_text}'}
+            self.__logger.warning(f'Agent "{self.__name}" decides not to reply due to invalid JSON: {response_text}')
 
         if response_json['should_reply']:
             state['should_reply'] = True

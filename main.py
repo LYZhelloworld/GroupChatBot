@@ -17,7 +17,7 @@ def prepare_model():
             else:
                 print(delta.status)
     print(f'Loading model {OLLAMA_MODEL}...')
-    client.generate(model=OLLAMA_MODEL)
+    client.generate(model=OLLAMA_MODEL, keep_alive='30m')
     print('Loaded.')
 
 
@@ -33,7 +33,7 @@ def main():
     agent_history.print_all_history()
 
     while True:
-        user_input = input(">>> ").strip()
+        user_input = prompt(">>> ").strip()
         if user_input == "/exit":
             break
 

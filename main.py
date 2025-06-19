@@ -2,7 +2,6 @@ from ollama import Client
 from prompt_toolkit import prompt
 from agent.agent import Agent
 from agent.history import AgentHistory
-from orchestrator.orchestrator import Orchestrator
 from utils.constants import *
 
 
@@ -30,15 +29,19 @@ def main():
     agent_b = Agent("agent_b", "你是一个总是很冷静的人。", agent_history)
     agent_c = Agent("agent_c", "你是一个对任何事物都有好奇心的人，活泼健谈。", agent_history)
 
-    orchestrator = Orchestrator([agent_a, agent_b, agent_c], agent_history)
+    agents = [agent_a, agent_b, agent_c]
     agent_history.print_all_history()
 
     while True:
-        user_input = prompt(">>> ")
+        user_input = input(">>> ").strip()
         if user_input == "/exit":
             break
 
-        orchestrator.chat(user_input)
+        if user_input:
+            agent_history.add(USER_AGENT_NAME, user_input)
+
+        for agent in agents:
+            agent.run()
 
 
 if __name__ == "__main__":

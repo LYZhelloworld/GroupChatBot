@@ -1,0 +1,15 @@
+[project]
+name = "group-chatbot"
+version = "1.0.0"
+description = "GroupChatBot is an interactive chatting tool with multiple agents, powered by local deployed LLM."
+readme = "README.md"
+requires-python = ">=3.9,<3.13"
+dependencies = [
+    "langchain>=0.3.25",
+    "langchain-community>=0.3.24",
+    "langchain-ollama>=0.3.3",
+    "langgraph>=0.4.8",
+    "ollama>=0.5.1",
+    "prompt-toolkit>=3.0.51",
+    "pydantic>=2.11.5",
+]

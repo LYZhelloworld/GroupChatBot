@@ -1,5 +1,5 @@
 # Container configuration
-FROM library/python:3.13.0-slim-bullseye
+FROM library/python:3.12.10-slim-bullseye
 WORKDIR /app
 COPY . .
 
